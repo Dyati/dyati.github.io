@@ -46,7 +46,7 @@ class MyHeader extends HTMLElement {
             <a href="./" class="navbar-brand" aria-current="page">
                 
                 <h1 class="text-start" aria-hidden="true">
-                    Beyondoxa
+                    Dyati
                 </h1>
                 
             </a>
@@ -68,12 +68,6 @@ class MyHeader extends HTMLElement {
                     </li>
                     <li class="ms-3 mb-3" role="none">
                         <a class="text-black hover-underline" href="3d-models.html" role="menuitem"> 3D Models </a>
-                    </li>
-                    <li class="ms-3 mb-3" role="none">
-                        <a class="text-black hover-underline" href="https://pikonparadox.itch.io/" target="_blank" rel="noopener noreferrer" role="menuitem"> Games </a>
-                    </li>
-                    <li class="ms-3 mb-3" role="none">
-                        <a class="text-black hover-underline" href="about.html" role="menuitem"> About </a>
                     </li>
                 </ul>
             </div>
@@ -100,11 +94,7 @@ class FooterNav extends HTMLElement {
             <li class="list-inline-item hover-underline" role="link"><a class="text-black" href="blog.html" role="menuitem">Blog</a></li>
             <li class="list-inline-item hover-underline" role="link"><a class="text-black" href="literature.html" role="menuitem">Literature</a></li>
             <li class="list-inline-item hover-underline" role="link"><a class="text-black" href="3d-models.html" role="menuitem">3D Models</a></li>
-            <li class="list-inline-item hover-underline" role="link"><a class="text-black" href="https://pikonparadox.itch.io/" target="_blank" rel="noopener noreferrer" role="menuitem">Games</a></li>
-            <li class="list-inline-item hover-underline" role="link"><a class="text-black" href="about.html" role="menuitem">About</a></li>
         </ul>
-        
-        <p class="text-muted">Website designed by Aditya</P>
     </nav>
 </footer>
         `;
@@ -182,7 +172,7 @@ const hometitles = [
 
 // Configuration variables (all times in milliseconds)
 const homeTitlesFadeTime = 250; // duration of fade in/out
-const hometitlesHoldTime = 2000; // time title stays fully visible
+const hometitlesHoldTime = 1250; // time title stays fully visible
 const homeTitlesWaitTime = 0; // time to wait before showing the next title
 
 // Select the HTML element where the titles will appear
