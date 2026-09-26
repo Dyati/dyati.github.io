@@ -1,366 +1,193 @@
-"use strict";
+//------------ADD GOAT COUNTER------------
+class AnalyticsCounter extends HTMLElement
+{
+  connectedCallback()
+  {
+    // Problem: Setting innerHTML with a <script> tag does not execute the script.
+    // Solution: We must create the script element programmatically and append it.
 
-/* =========================================================
-   DYATI
-   Site JavaScript
-   ========================================================= */
-
-
-/* =========================================================
-   SHARED HEADER
-   ========================================================= */
-
-class SiteHeader extends HTMLElement {
-  connectedCallback() {
-    if (this.hasChildNodes()) {
+    // 1. Check if the script has already been added to prevent duplicates
+    if (document.head.querySelector('script[data-goatcounter]'))
+    {
+      // console.log("AnalyticsCounter script already initialized.");
       return;
     }
 
-    this.innerHTML = `
-      <header class="site-header" id="site-header">
-        <div class="site-header-inner">
+    // 2. Create the script element
+    const script = document.createElement('script');
 
-          <a
-            class="site-brand"
-            href="#main-content"
-            aria-label="Dyati home"
-          >
-            Dyati
-          </a>
+    // 3. Set the required attributes
+    // This attribute tells AnalyticsCounter where to send the data.
+    script.setAttribute('data-goatcounter', 'https://epicsteme.goatcounter.com/count');
 
-          <nav
-            class="site-navigation"
-            aria-label="Primary navigation"
-          >
-            <a href="#art-header">Art</a>
-            <a href="#literature-header">Literature</a>
-          </nav>
+    // The async attribute is required for non-blocking loading
+    script.setAttribute('async', '');
 
-        </div>
-      </header>
-    `;
+    // Set the source URL
+    script.src = '//gc.zgo.at/count.js';
+
+    // 4. Append the script to the <head> of the document, 
+    // which is the standard place for global tracking scripts.
+    document.head.appendChild(script);
+
+    // Optional: Hide the element itself as it doesn't need to be visible
+    this.style.display = 'none';
   }
 }
 
+//------------IMPLEMENT GOAT COUNTER------------
+customElements.define("analytics-counter", AnalyticsCounter);
 
-/* =========================================================
-   SHARED FOOTER
-   ========================================================= */
-
-class SiteFooter extends HTMLElement {
-  connectedCallback() {
-    if (this.hasChildNodes()) {
-      return;
-    }
-
+//------------ADD HEADER NAVIGATION------------
+class SiteHeader extends HTMLElement
+{
+  connectedCallback()
+  {
     this.innerHTML = `
-      <footer
-        class="site-footer"
-        id="site-footer"
-      >
-        <nav aria-label="Footer navigation">
-          <a href="#main-content">
-            Back to top
-          </a>
+    <header id="header">
+        
+        <nav class="navbar navbar-expand-lg py-0 mx-0 my-0" aria-label="Primary navigation">
+            
+            <a href="./" class="navbar-brand" aria-current="page">
+                
+                <h1 class="text-start" aria-hidden="true">
+                    Dyati
+                </h1>
+                
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mobile-navigation" aria-controls="mobile-navigation" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-          <a href="#art-header">
-            Art
-          </a>
-
-          <a href="#literature-header">
-            Literature
-          </a>
+            <div class="collapse navbar-collapse" id="mobile-navigation">
+                <ul class="navbar-nav ms-auto" role="menubar">
+                    <li class="ms-3 mb-3" role="none">
+                        <a class="text-black link-underline" href="./" role="menuitem"> Home </a>
+                    </li>
+                    <li class="ms-3 mb-3" role="none">
+                    <a class="text-black link-underline" href="art.html" role="menuitem"> Art </a>
+                    </li>
+                    <li class="ms-3 mb-3" role="none">
+                    <a class="text-black link-underline" href="photography.html" role="menuitem"> Photography </a>
+                    </li>
+                    <li class="ms-3 mb-3" role="none">
+                        <a class="text-black link-underline" href="literature.html" role="menuitem"> Literature </a>
+                    </li>
+                </ul>
+            </div>
         </nav>
-      </footer>
-    `;
+        <hr class="mt-0 mb-2">
+    </header> `;
   }
 }
 
+//------------IMPLEMENT FUNCTION HEADER------------
+customElements.define("site-header", SiteHeader);
 
-/* =========================================================
-   REGISTER CUSTOM ELEMENTS
-   ========================================================= */
+//
 
-if (!customElements.get("site-header")) {
-  customElements.define(
-    "site-header",
-    SiteHeader
-  );
-}
-
-if (!customElements.get("site-footer")) {
-  customElements.define(
-    "site-footer",
-    SiteFooter
-  );
-}
-
-
-/* =========================================================
-   ACCORDIONS
-   ========================================================= */
-
-function initializeAccordions() {
-  const buttons = document.querySelectorAll(
-    ".toggle-section-button, .toggle-article-button"
-  );
-
-  buttons.forEach((button) => {
-    const targetId =
-      button.getAttribute("aria-controls");
-
-    if (!targetId) {
-      return;
-    }
-
-    const target =
-      document.getElementById(targetId);
-
-    if (!target) {
-      return;
-    }
-
-    if (
-      button.dataset.accordionInitialized ===
-      "true"
-    ) {
-      return;
-    }
-
-    button.dataset.accordionInitialized =
-      "true";
-
-    const initiallyExpanded =
-      button.getAttribute(
-        "aria-expanded"
-      ) === "true";
-
-    target.hidden =
-      !initiallyExpanded;
-
-    button.addEventListener(
-      "click",
-      () => {
-        const isExpanded =
-          button.getAttribute(
-            "aria-expanded"
-          ) === "true";
-
-        const nextState =
-          !isExpanded;
-
-        button.setAttribute(
-          "aria-expanded",
-          String(nextState)
-        );
-
-        target.hidden =
-          !nextState;
-      }
-    );
-  });
-}
-
-
-/* =========================================================
-   ARTWORK LIGHTBOX
-   ========================================================= */
-
-function initializeLightbox() {
-  const lightbox =
-    document.getElementById(
-      "artwork-lightbox"
-    );
-
-  const image =
-    document.getElementById(
-      "lightbox-image"
-    );
-
-  const closeButton =
-    document.querySelector(
-      ".lightbox-close"
-    );
-
-  const triggers =
-    document.querySelectorAll(
-      ".artwork-trigger"
-    );
-
-  if (
-    !lightbox ||
-    !image ||
-    !closeButton ||
-    !triggers.length
-  ) {
-    return;
+//------------ADD FOOTER NAVIGATION------------
+class SiteFooter extends HTMLElement
+{
+  connectedCallback()
+  {
+    this.innerHTML = `
+<footer class="container-lg text-center mb-3" aria-label="Footer navigation">
+    <hr class="container-lg">
+    <nav aria-label="Footer site links">
+        <ul class="list-inline mb-2" role="menubar">
+            <li class="list-inline-item link-underline" role="link"><a class="text-black" href="./" role="menuitem">Home</a></li>
+            <li class="list-inline-item link-underline" role="link"><a class="text-black" href="art.html" role="menuitem">Art</a></li>
+            <li class="list-inline-item link-underline" role="link"><a class="text-black" href="photography.html" role="menuitem">Photography</a></li>
+            <li class="list-inline-item link-underline" role="link"><a class="text-black" href="literature.html" role="menuitem">Literature</a></li>
+        </ul>
+        
+    </nav>
+</footer>
+        `;
   }
-
-  let lastTrigger = null;
-
-  let previousBodyOverflow = "";
-  let previousHtmlOverflow = "";
-
-
-  function openLightbox(trigger) {
-    const source =
-      trigger.dataset.lightboxSrc;
-
-    if (!source) {
-      return;
-    }
-
-    lastTrigger = trigger;
-
-    image.src = source;
-
-    image.alt =
-      trigger.dataset.lightboxAlt || "";
-
-
-    previousBodyOverflow =
-      document.body.style.overflow;
-
-    previousHtmlOverflow =
-      document.documentElement.style.overflow;
-
-
-    document.body.style.overflow =
-      "hidden";
-
-    document.documentElement.style.overflow =
-      "hidden";
-
-
-    lightbox.classList.add(
-      "is-open"
-    );
-
-    lightbox.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-
-    closeButton.focus();
-  }
-
-
-  function closeLightbox() {
-    lightbox.classList.remove(
-      "is-open"
-    );
-
-    lightbox.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-
-    document.body.style.overflow =
-      previousBodyOverflow;
-
-    document.documentElement.style.overflow =
-      previousHtmlOverflow;
-
-
-    window.setTimeout(
-      () => {
-        if (
-          !lightbox.classList.contains(
-            "is-open"
-          )
-        ) {
-          image.removeAttribute(
-            "src"
-          );
-
-          image.alt = "";
-        }
-      },
-      200
-    );
-
-
-    if (
-      lastTrigger &&
-      document.contains(lastTrigger)
-    ) {
-      lastTrigger.focus();
-    }
-
-    lastTrigger = null;
-  }
-
-
-  triggers.forEach((trigger) => {
-    if (
-      trigger.dataset.lightboxInitialized ===
-      "true"
-    ) {
-      return;
-    }
-
-    trigger.dataset.lightboxInitialized =
-      "true";
-
-
-    trigger.addEventListener(
-      "click",
-      () => {
-        openLightbox(trigger);
-      }
-    );
-  });
-
-
-  closeButton.addEventListener(
-    "click",
-    closeLightbox
-  );
-
-
-  lightbox.addEventListener(
-    "click",
-    (event) => {
-      if (
-        event.target === lightbox
-      ) {
-        closeLightbox();
-      }
-    }
-  );
-
-
-  document.addEventListener(
-    "keydown",
-    (event) => {
-      if (
-        event.key === "Escape" &&
-        lightbox.classList.contains(
-          "is-open"
-        )
-      ) {
-        event.preventDefault();
-
-        closeLightbox();
-      }
-    }
-  );
 }
+
+//------------IMPLEMENT FUNCTION FOOTER------------
+customElements.define("site-footer", SiteFooter);
+
+//------------LOAD BOOTSTRAP CSS AND JS FROM A CDN------------
+class SiteAssetsLoader extends HTMLElement
+{
+  connectedCallback()
+  {
+    // Add Bootstrap CSS CDN
+    if (!document.getElementById("bootstrap-css"))
+    {
+      const link = document.createElement("link");
+      link.id = "bootstrap-css";
+      link.rel = "stylesheet";
+      link.href =
+        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css";
+      link.integrity =
+        "sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr";
+      link.crossOrigin = "anonymous";
+      document.head.appendChild(link);
+    }
+
+    // Add BOOTSTRAP JS CDN
+    if (!document.getElementById("bootstrap-js"))
+    {
+      const script = document.createElement("script");
+      script.id = "bootstrap-js";
+      script.src =
+        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js";
+      script.integrity =
+        "sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q";
+      script.crossOrigin = "anonymous";
+      script.onload = () =>
+      {
+        // Dispatch a custom event when Bootstrap JS is loaded
+        document.dispatchEvent(new Event("bootstrap:loaded"));
+      };
+      document.head.appendChild(script);
+    } else
+    {
+      // If already loaded, dispatch immediately
+      document.dispatchEvent(new Event("bootstrap:loaded"));
+    }
+  }
+}
+
+// ------------IMPLEMENT FUNCTION TO LOAD BOOTSTRAP ASSETS------------
+customElements.define("site-assets-loader", SiteAssetsLoader);
+
+// ------------WAIT TO SHOW INDEX PAGE CONTENTS------------
+// this seems to be tied to "page-fade" and "page-fade.visible" in custom.css
+window.addEventListener("load", () =>
+{
+  // Fade in hero-title after 0.25 seconds (250 ms)
+  setTimeout(() =>
+  {
+    document.getElementById("home-page").classList.add("visible");
+  }, 250);
+
+  /* Fade in hero-subtitle after 1.0 seconds (1000 ms)
+  setTimeout(() => {
+    document.getElementById("hero-subtitle").classList.add("visible");
+  }, 2000);*/
+});
 
 
 /* =========================================================
    HOME TITLE ROTATION
    ========================================================= */
 
-function initializeHomeTitleRotation() {
+function initializeHomeTitleRotation()
+{
   const titleElement =
     document.getElementById(
-      "home-title-cycle"
+      "hero-role"
     );
 
-  if (!titleElement) {
+  if (!titleElement)
+  {
     return;
   }
 
@@ -390,12 +217,14 @@ function initializeHomeTitleRotation() {
     `opacity ${fadeDuration}ms ease`;
 
 
-  function showNextTitle() {
+  function showNextTitle()
+  {
     titleElement.textContent =
       titles[titleIndex];
 
 
-    if (reducedMotion.matches) {
+    if (reducedMotion.matches)
+    {
       titleIndex =
         (titleIndex + 1) %
         titles.length;
@@ -414,7 +243,8 @@ function initializeHomeTitleRotation() {
 
 
     window.setTimeout(
-      () => {
+      () =>
+      {
         titleElement.style.opacity =
           "0";
       },
@@ -423,7 +253,8 @@ function initializeHomeTitleRotation() {
 
 
     window.setTimeout(
-      () => {
+      () =>
+      {
         titleIndex =
           (titleIndex + 1) %
           titles.length;
@@ -431,7 +262,7 @@ function initializeHomeTitleRotation() {
         showNextTitle();
       },
       displayDuration +
-        fadeDuration
+      fadeDuration
     );
   }
 
@@ -439,14 +270,12 @@ function initializeHomeTitleRotation() {
   showNextTitle();
 }
 
-
 /* =========================================================
    INITIALIZATION
    ========================================================= */
 
-function initializeSite() {
-  initializeAccordions();
-  initializeLightbox();
+function initializeSite()
+{
   initializeHomeTitleRotation();
 }
 
@@ -458,7 +287,8 @@ function initializeSite() {
 if (
   document.readyState ===
   "loading"
-) {
+)
+{
   document.addEventListener(
     "DOMContentLoaded",
     initializeSite,
@@ -466,6 +296,8 @@ if (
       once: true
     }
   );
-} else {
+} else
+{
   initializeSite();
 }
+
